@@ -7,10 +7,20 @@ import com.epam.izh.rd.online.autcion.entity.User;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
 public class JdbcTemplatePublicAuction implements PublicAuction {
+
+    private final JdbcTemplate jdbcTemplate;
+    
+    @Autowired
+    public JdbcTemplatePublicAuction(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
     public List<Bid> getUserBids(long id) {
