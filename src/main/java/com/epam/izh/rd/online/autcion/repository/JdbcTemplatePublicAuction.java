@@ -7,12 +7,16 @@ import com.epam.izh.rd.online.autcion.entity.User;
 import java.util.List;
 import java.util.Map;
 
+import com.epam.izh.rd.online.autcion.mappers.BidMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
+@Repository
 public class JdbcTemplatePublicAuction implements PublicAuction {
 
     private final JdbcTemplate jdbcTemplate;
@@ -24,7 +28,11 @@ public class JdbcTemplatePublicAuction implements PublicAuction {
 
     @Override
     public List<Bid> getUserBids(long id) {
-        return emptyList();
+        //return emptyList();
+
+        String sqlGetUserBids = "SELECT bids.bid_value FROM bids WHERE user_id=" + id;
+        BidMapper bidMapper = new BidMapper();
+        return jdbcTemplate.query(sqlGetUserBids, bidMapper);
     }
 
     @Override

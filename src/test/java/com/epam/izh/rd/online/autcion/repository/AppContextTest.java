@@ -1,5 +1,6 @@
 package com.epam.izh.rd.online.autcion.repository;
 
+import com.epam.izh.rd.online.autcion.configuration.JdbcTemplateConfiguration;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import javax.sql.DataSource;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @SpringBootTest
+        //(classes = { JdbcTemplateConfiguration.class })
 @ComponentScan(basePackages = "com.epam.izh.rd.online.autcion")
 public class AppContextTest {
 
