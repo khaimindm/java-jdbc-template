@@ -21,6 +21,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.BootstrapWith;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.sql.Date;
 import java.text.DateFormat;
@@ -38,7 +39,9 @@ import static org.junit.jupiter.api.Assertions.*;
         //(classes = { JdbcTemplateConfiguration.class })
 @ContextConfiguration(classes = JdbcTemplateConfiguration.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(BidMapper.class)
+//@Import(BidMapper.class)
+//@Sql({"src/main/resources/schema.sql", "src/main/resources/data.sql"})
+@Sql({"/schema_test.sql", "/data_test.sql"})
 //@BootstrapWith(JdbcTemplateConfiguration.class)
 //@ComponentScan(basePackages = "com.epam.izh.rd.online.autcion")
 class JdbcTemplatePublicAuctionTest {
@@ -103,7 +106,7 @@ class JdbcTemplatePublicAuctionTest {
         List<Bid> userBids = Lists.newArrayList(bid1, bid3);
 
         List<Bid> items = publicAuction.getUserBids(userId);
-
+                
         assertIterableEquals(userBids, items);
     }
 

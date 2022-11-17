@@ -12,7 +12,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
-@SpringBootApplication
+//@SpringBootApplication
 //@Configuration
 @ComponentScan(basePackages = "com.epam.izh.rd.online.autcion")
 @PropertySource("classpath:application.properties")
