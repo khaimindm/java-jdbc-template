@@ -27,13 +27,9 @@ public class JdbcTemplatePublicAuction implements PublicAuction {
     }
 
     @Override
-    public List<Bid> getUserBids(long id) {
-        //return emptyList();
-
-        //String sqlGetUserBids = "SELECT bids.bid_value FROM bids WHERE user_id=" + id;
-        String sqlGetUserBids = "SELECT * FROM bids WHERE user_id=" + id;
-        BidMapper bidMapper = new BidMapper();
-        return jdbcTemplate.query(sqlGetUserBids, bidMapper);
+    public List<Bid> getUserBids(long id) {        
+        String sqlGetUserBids = "SELECT * FROM bids WHERE user_id=" + id;        
+        return jdbcTemplate.query(sqlGetUserBids, new BidMapper());
     }
 
     @Override

@@ -12,6 +12,15 @@ public class ItemMapper implements RowMapper<Item> {
 
     @Override
     public Item mapRow(ResultSet resultSet, int i) throws SQLException {
+        Item item = new Item();
+
+        item.setItemId(resultSet.getLong("item_id"));
+        item.setBidIncrement(resultSet.getDouble("bid_increment"));
+        item.setBuyItNow(resultSet.getBoolean("buy_it_now"));
+        item.setDescription(resultSet.getString("description"));
+        item.setStartDate(new java.sql.Date(resultSet.getDate("start_date").getTime()).toLocalDate());
+        item.setStartPrice(resultSet.getDouble("start_price"));
+
         return new Item();
     }
 }
