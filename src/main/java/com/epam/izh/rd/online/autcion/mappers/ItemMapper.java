@@ -20,7 +20,10 @@ public class ItemMapper implements RowMapper<Item> {
         item.setDescription(resultSet.getString("description"));
         item.setStartDate(new java.sql.Date(resultSet.getDate("start_date").getTime()).toLocalDate());
         item.setStartPrice(resultSet.getDouble("start_price"));
+        item.setStopDate(new java.sql.Date(resultSet.getDate("stop_date").getTime()).toLocalDate());
+        item.setTitle(resultSet.getString("title"));
+        item.setUserId(resultSet.getLong("user_id"));                
 
-        return new Item();
+        return item;
     }
 }

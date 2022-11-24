@@ -12,6 +12,11 @@ public class UserMapper implements RowMapper<User> {
 
     @Override
     public User mapRow(ResultSet resultSet, int i) throws SQLException {
+        User user = new User();
+
+        user.setUserId(resultSet.getLong("user_id"));
+        
+
         return new User();
     }
 }
