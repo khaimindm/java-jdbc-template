@@ -42,12 +42,14 @@ public class JdbcTemplatePublicAuction implements PublicAuction {
 
     @Override
     public Item getItemByName(String name) {
-        return new Item();
+        String sqlGetItemByName = "SELECT * FROM items WHERE title=" + "'" + name + "'";        
+        return jdbcTemplate.queryForObject(sqlGetItemByName, new ItemMapper());        
     }
 
     @Override
     public Item getItemByDescription(String name) {
-        return new Item();
+        String sqlGetItemByDescription = "SELECT * FROM items WHERE description=" + "'" + name + "'";
+        return jdbcTemplate.queryForObject(sqlGetItemByDescription, new ItemMapper());
     }
 
     @Override
