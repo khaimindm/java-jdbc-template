@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.epam.izh.rd.online.autcion.mappers.BidMapper;
+import com.epam.izh.rd.online.autcion.mappers.ItemMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -34,7 +36,8 @@ public class JdbcTemplatePublicAuction implements PublicAuction {
 
     @Override
     public List<Item> getUserItems(long id) {
-        return emptyList();
+        String sqlGetUserItems = "SELECT * FROM items WHERE user_id=" + id;        
+        return jdbcTemplate.query(sqlGetUserItems, new ItemMapper());
     }
 
     @Override
