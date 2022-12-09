@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.epam.izh.rd.online.autcion.mappers.BidMapper;
 import com.epam.izh.rd.online.autcion.mappers.ItemMapper;
+import com.epam.izh.rd.online.autcion.mappers.UserMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Repository;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+
+import java.util.HashMap;
 
 @Repository
 public class JdbcTemplatePublicAuction implements PublicAuction {
@@ -54,7 +57,15 @@ public class JdbcTemplatePublicAuction implements PublicAuction {
 
     @Override
     public Map<User, Double> getAvgItemCost() {
-        return emptyMap();
+        Map<User, Double> avgItemCost = new HashMap<>();
+        String sqlGetAvgItemCost = "SELECT users_prices.user_id, users_prices.billing_address, users_prices.full_name, users_prices.login, users_prices.password, AVG(users_prices.start_price) AS avg" +
+        "FROM (SELECT users.*, items.start_price" +
+        "FROM users" +
+        "INNER JOIN items" +
+        "ON users.user_id = items.user_id) AS users_prices" +
+        "GROUP BY users_prices.full_name;";
+        
+        return emptyMap();       
     }
 
     @Override
