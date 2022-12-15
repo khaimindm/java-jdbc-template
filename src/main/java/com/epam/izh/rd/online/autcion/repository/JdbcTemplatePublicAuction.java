@@ -58,13 +58,36 @@ public class JdbcTemplatePublicAuction implements PublicAuction {
     @Override
     public Map<User, Double> getAvgItemCost() {
         Map<User, Double> avgItemCost = new HashMap<>();
-        String sqlGetAvgItemCost = "SELECT users_prices.user_id, users_prices.billing_address, users_prices.full_name, users_prices.login, users_prices.password, AVG(users_prices.start_price) AS avg" +
-        "FROM (SELECT users.*, items.start_price" +
+        //String sqlGetAvgItemCost = "SELECT * FROM users";
+
+        String sqlGetAvgItemCost = "SELECT result.user_id, result.start_price" +
+        "FROM users" +
+        "LEFT JOIN items" +
+        "ON users.user_id=items.user_id AS result";
+
+        /*"SELECT users_prices.user_id, users_prices.billing_address, users_prices.full_name, users_prices.login, users_prices.password, AVG(users_prices.start_price) AS avg_result" +
+        "FROM (SELECT users.user_id, users.billing_address, users.full_name, users.login, users.password, items.start_price" +
         "FROM users" +
         "INNER JOIN items" +
         "ON users.user_id = items.user_id) AS users_prices" +
-        "GROUP BY users_prices.full_name;";
+        "GROUP BY users_prices.full_name";*/
         
+        //Map<String, Object> map = jdbcTemplate.queryForMap(sqlGetAvgItemCost);
+        //String testString = String.valueOf(map.get("title"));
+        //System.out.println(testString);
+
+        
+        //String testString;
+
+        List<Map<String, Object>> resultList = jdbcTemplate.queryForList(sqlGetAvgItemCost);
+
+        for (Map map : resultList) {
+            String avgString = String.valueOf(map.get("start_price"));
+            //String billingAddressString = String.valueOf(map.get("billing_address"));
+            System.out.println(avgString);
+            //System.out.println(billingAddressString);
+        }
+
         return emptyMap();       
     }
 
