@@ -60,10 +60,10 @@ public class JdbcTemplatePublicAuction implements PublicAuction {
         Map<User, Double> avgItemCost = new HashMap<>();
         //String sqlGetAvgItemCost = "SELECT * FROM users";
 
-        String sqlGetAvgItemCost = "SELECT result.user_id, result.start_price" +
+        /*String sqlGetAvgItemCost = "SELECT result.user_id, result.start_price" +
         "FROM users" +
         "LEFT JOIN items" +
-        "ON users.user_id=items.user_id AS result";
+        "ON users.user_id=items.user_id AS result";*/
 
         /*"SELECT users_prices.user_id, users_prices.billing_address, users_prices.full_name, users_prices.login, users_prices.password, AVG(users_prices.start_price) AS avg_result" +
         "FROM (SELECT users.user_id, users.billing_address, users.full_name, users.login, users.password, items.start_price" +
@@ -79,16 +79,27 @@ public class JdbcTemplatePublicAuction implements PublicAuction {
         
         //String testString;
 
-        List<Map<String, Object>> resultList = jdbcTemplate.queryForList(sqlGetAvgItemCost);
+        List<User> users;
+        String sqlGetUsers = "SELECT * FROM users";
+        users = jdbcTemplate.query(sqlGetUsers, new UserMapper());        
 
-        for (Map map : resultList) {
+        for (User user : users) {            
+            String avgItem = "SELECT AVG(start_price) FROM items WHERE user_id = " + "'" + user.getUserId() + "'";
+            double avgRes = jdbcTemplate.queryForObject(avgItem, double.class);                     
+            avgItemCost.put(user, avgRes);            
+        }        
+
+        //List<Map<String, Object>> resultList = jdbcTemplate.queryForList(sqlGetAvgItemCost);
+
+        /*for (Map map : resultList) {
             String avgString = String.valueOf(map.get("start_price"));
             //String billingAddressString = String.valueOf(map.get("billing_address"));
             System.out.println(avgString);
             //System.out.println(billingAddressString);
-        }
+        }*/
 
-        return emptyMap();       
+        //return emptyMap();
+        return avgItemCost;       
     }
 
     @Override
