@@ -24,12 +24,15 @@ import java.util.HashMap;
 @Repository
 public class JdbcTemplatePublicAuction implements PublicAuction {
 
-    private final JdbcTemplate jdbcTemplate;
+    /*private final JdbcTemplate jdbcTemplate;
     
     @Autowired
     public JdbcTemplatePublicAuction(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-    }
+    }*/
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
 
     @Override
     public List<Bid> getUserBids(long id) {        
@@ -58,53 +61,44 @@ public class JdbcTemplatePublicAuction implements PublicAuction {
     @Override
     public Map<User, Double> getAvgItemCost() {
         Map<User, Double> avgItemCost = new HashMap<>();
-        //String sqlGetAvgItemCost = "SELECT * FROM users";
 
-        /*String sqlGetAvgItemCost = "SELECT result.user_id, result.start_price" +
-        "FROM users" +
-        "LEFT JOIN items" +
-        "ON users.user_id=items.user_id AS result";*/
-
-        /*"SELECT users_prices.user_id, users_prices.billing_address, users_prices.full_name, users_prices.login, users_prices.password, AVG(users_prices.start_price) AS avg_result" +
-        "FROM (SELECT users.user_id, users.billing_address, users.full_name, users.login, users.password, items.start_price" +
-        "FROM users" +
-        "INNER JOIN items" +
-        "ON users.user_id = items.user_id) AS users_prices" +
-        "GROUP BY users_prices.full_name";*/
-        
-        //Map<String, Object> map = jdbcTemplate.queryForMap(sqlGetAvgItemCost);
-        //String testString = String.valueOf(map.get("title"));
-        //System.out.println(testString);
-
-        
-        //String testString;
-
-        List<User> users;
         String sqlGetUsers = "SELECT * FROM users";
-        users = jdbcTemplate.query(sqlGetUsers, new UserMapper());        
+        List<User> userList = jdbcTemplate.query(sqlGetUsers, new UserMapper());
 
-        for (User user : users) {            
+        for (User user : userList) {
             String avgItem = "SELECT AVG(start_price) FROM items WHERE user_id = " + "'" + user.getUserId() + "'";
-            double avgRes = jdbcTemplate.queryForObject(avgItem, double.class);                     
-            avgItemCost.put(user, avgRes);            
-        }        
+            Object avgResult = jdbcTemplate.queryForObject(avgItem, double.class);
+            if (avgResult != null) {
+                avgItemCost.put(user, Double.valueOf(avgResult.toString()));
+            } else {
+                continue;
+            }
+        }
 
-        //List<Map<String, Object>> resultList = jdbcTemplate.queryForList(sqlGetAvgItemCost);
-
-        /*for (Map map : resultList) {
-            String avgString = String.valueOf(map.get("start_price"));
-            //String billingAddressString = String.valueOf(map.get("billing_address"));
-            System.out.println(avgString);
-            //System.out.println(billingAddressString);
-        }*/
-
-        //return emptyMap();
         return avgItemCost;       
     }
 
     @Override
     public Map<Item, Bid> getMaxBidsForEveryItem() {
-        return emptyMap();
+        Map<Item, Bid> maxBidsForEveryItem = new HashMap<>();
+
+        String sqlGetItems = "SELECT * FROM items";
+        List<Item> itemList = jdbcTemplate.query(sqlGetItems, new ItemMapper());
+
+        for (Item item : itemList) {
+            String sqlMaxBidForEveryItem = "SELECT * " +
+                    "FROM bids " +
+                    "WHERE bid_value = (SELECT MAX(bid_value) " +
+                    "FROM bids " +
+                    "WHERE item_id =" + "'" + item.getItemId() + "'" + ")";
+            Bid bid = jdbcTemplate.queryForObject(sqlMaxBidForEveryItem, new BidMapper());
+            if (bid != null) {
+                maxBidsForEveryItem.put(item, bid);
+            } else {
+                continue;
+            }
+        }
+        return maxBidsForEveryItem;
     }
 
     @Override
