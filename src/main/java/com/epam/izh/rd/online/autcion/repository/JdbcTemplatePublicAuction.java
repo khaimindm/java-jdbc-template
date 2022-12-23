@@ -83,8 +83,22 @@ public class JdbcTemplatePublicAuction implements PublicAuction {
     public Map<Item, Bid> getMaxBidsForEveryItem() {
         Map<Item, Bid> maxBidsForEveryItem = new HashMap<>();
 
-        /*String sqlGetItems = "SELECT * FROM items";
-        List<Item> itemList = jdbcTemplate.query(sqlGetItems, new ItemMapper());*/
+        String sqlGetItems = "SELECT * FROM items";
+        List<Item> itemList = jdbcTemplate.query(sqlGetItems, new ItemMapper());
+
+        for (Item item: itemList) {
+            item.getItemId()
+        }
+
+        /*
+        SELECT items_item_id, bid_increment, buy_it_now, description, start_date, start_price, stop_date, title, user_id, bid_id, bid_date, bid_value, bids_user_id
+        FROM (SELECT items.item_id AS items_item_id, items.bid_increment, items.buy_it_now, items.description, items.start_date, items.start_price, items.stop_date, items.title, items.user_id,
+                bids.bid_id, bids.bid_date, bids.bid_value, bids.user_id AS bids_user_id
+                FROM items
+                INNER JOIN bids
+                ON items.item_id = bids.item_id) AS result
+        WHERE result.items_item_id = '1'
+         */
 
         
         String sqlMaxBidForEveryItem = "SELECT T1.item_id AS t1itemid, T1.bid_increment, T1.buy_it_now, T1.description, T1.start_date, T1.start_price, T1.stop_date, T1.title, T1.user_id, " +
