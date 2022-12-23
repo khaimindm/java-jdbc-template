@@ -19,6 +19,7 @@ import org.springframework.stereotype.Repository;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 
 @Repository
@@ -82,22 +83,56 @@ public class JdbcTemplatePublicAuction implements PublicAuction {
     public Map<Item, Bid> getMaxBidsForEveryItem() {
         Map<Item, Bid> maxBidsForEveryItem = new HashMap<>();
 
-        String sqlGetItems = "SELECT * FROM items";
-        List<Item> itemList = jdbcTemplate.query(sqlGetItems, new ItemMapper());
+        /*String sqlGetItems = "SELECT * FROM items";
+        List<Item> itemList = jdbcTemplate.query(sqlGetItems, new ItemMapper());*/
 
-        for (Item item : itemList) {
-            String sqlMaxBidForEveryItem = "SELECT * " +
-                    "FROM bids " +
-                    "WHERE bid_value = (SELECT MAX(bid_value) " +
-                    "FROM bids " +
-                    "WHERE item_id =" + "'" + item.getItemId() + "'" + ")";
-            Bid bid = jdbcTemplate.queryForObject(sqlMaxBidForEveryItem, new BidMapper());
-            if (bid != null) {
-                maxBidsForEveryItem.put(item, bid);
+        
+        String sqlMaxBidForEveryItem = "SELECT T1.item_id AS t1itemid, T1.bid_increment, T1.buy_it_now, T1.description, T1.start_date, T1.start_price, T1.stop_date, T1.title, T1.user_id, " +
+                    "T2.bid_id, T2.bid_date, MAX(T2.bid_value), T2.user_id AS bidsuserid " +
+                    "FROM items AS T1 " +
+                    "LEFT JOIN bids AS T2 " +
+                    "ON T1.item_id = T2.item_id " +
+                    "GROUP BY T1.item_id";
+        List<Map<String, Object>> results = jdbcTemplate.queryForList(sqlMaxBidForEveryItem);
+
+        for (Map<String,Object> map : results) {    
+            
+            String testString = map.get("bid_value").toString();
+
+            if (map.get("bid_value") != null) {                        
+            Item item = new Item();
+            item.setItemId(Long.valueOf(map.get("item_id").toString()));
+            item.setBidIncrement(Double.valueOf(map.get("bid_increment").toString()));
+            item.setBuyItNow(Boolean.valueOf(map.get("buy_it_now").toString()));
+            item.setDescription(map.get("description").toString());
+            item.setStartDate(LocalDate.parse(map.get("start_date").toString()));
+            item.setStartPrice(Double.valueOf(map.get("start_price").toString()));
+            item.setStopDate(LocalDate.parse(map.get("stop_date").toString()));
+            item.setTitle(map.get("title").toString());
+            item.setUserId(Long.valueOf(map.get("user_id").toString()));
+
+            Bid bid = new Bid();
+            bid.setBidId(Long.valueOf(map.get("bid_id").toString()));
+            bid.setBidDate(LocalDate.parse(map.get("bid_date").toString()));
+            bid.setBidValue(Double.valueOf(map.get("bid_value").toString()));
+            bid.setItemId(Long.valueOf(map.get("item_id").toString()));
+            bid.setUserId(Long.valueOf(map.get("bidsuserid").toString()));
+
+            maxBidsForEveryItem.put(item, bid);
             } else {
                 continue;
             }
         }
+
+        //"WHERE item_id =" + "'" + item.getItemId() + "'" + ")";
+
+            //Bid bid = jdbcTemplate.queryForObject(sqlMaxBidForEveryItem, new BidMapper());
+            /*if (bid != null) {
+                maxBidsForEveryItem.put(item, bid);
+            } else {
+                continue;
+            }*/
+        
         return maxBidsForEveryItem;
     }
 
