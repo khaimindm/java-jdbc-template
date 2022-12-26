@@ -101,12 +101,22 @@ public class JdbcTemplatePublicAuction implements PublicAuction {
          */
 
         
-        String sqlMaxBidForEveryItem = "SELECT T1.item_id AS t1itemid, T1.bid_increment, T1.buy_it_now, T1.description, T1.start_date, T1.start_price, T1.stop_date, T1.title, T1.user_id, " +
+        /*String sqlMaxBidForEveryItem = "SELECT T1.item_id AS t1itemid, T1.bid_increment, T1.buy_it_now, T1.description, T1.start_date, T1.start_price, T1.stop_date, T1.title, T1.user_id, " +
                     "T2.bid_id, T2.bid_date, MAX(T2.bid_value), T2.user_id AS bidsuserid " +
                     "FROM items AS T1 " +
                     "LEFT JOIN bids AS T2 " +
                     "ON T1.item_id = T2.item_id " +
-                    "GROUP BY T1.item_id";
+                    "GROUP BY T1.item_id";*/
+        
+        String sqlMaxBidForEveryItem = "SELECT items_bids.item_id, items_bids.bid_increment, items_bids.buy_it_now, items_bids.description, items_bids.start_date, items_bids.start_price, items_bids.stop_date, items_bids.title, items_bids.user_id, " +
+        "items_bids.bid_id, items_bids.bid_date, MAX(items_bids.bid_value), items_bids.bids_user_id " +
+        "FROM (SELECT items.item_id, items.bid_increment, items.buy_it_now, items.description, items.start_date, items.start_price, items.stop_date, items.title, items.user_id, " +
+        "bids.bid_id, bids.bid_date, bids.bid_value, bids.user_id AS bids_user_id " +
+        "FROM items " +
+        "INNER JOIN bids " +
+        "ON items.item_id = bids.item_id) AS items_bids " +
+        "GROUP BY items_bids.item_id";
+
         List<Map<String, Object>> results = jdbcTemplate.queryForList(sqlMaxBidForEveryItem);
 
         for (Map<String,Object> map : results) {    
