@@ -108,19 +108,42 @@ public class JdbcTemplatePublicAuction implements PublicAuction {
     @Override
     public boolean createUser(User user) {
         String sqlCreateUser = "INSERT INTO users (user_id, billing_address, full_name, login, password) " +
-                "VALUES (" + user.getUserId() + "," + user.getBillingAddress() + "," + user.getFullName() + "," + user.getLogin() + "," + user.getPassword() + ")";
+                "VALUES (" + "'" + user.getUserId() + "'" + "," + "'" + user.getBillingAddress() + "'" + "," + "'" +
+                user.getFullName() + "'" + "," + "'" + user.getLogin() + "'" + "," + "'" + user.getPassword() + "')";
         int testCreateUser = jdbcTemplate.update(sqlCreateUser);
-        return true;
+        if (testCreateUser == 1) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
     public boolean createItem(Item item) {
-        return false;
+        String sqlCreateItem = "INSERT INTO items (item_id, bid_increment, buy_it_now, description, start_date, " +
+                "start_price, stop_date, title, user_id) " +
+                "VALUES ('" + item.getItemId() + "'," + "'" + item.getBidIncrement() +"', '" + item.getBuyItNow() +
+                "', '" + item.getDescription() + "', '" + item.getStartDate() + "', '" + item.getStartPrice() + "', '"
+                + item.getStopDate() + "', '" + item.getTitle() + "', '" + item.getUserId() + "')";
+        int testCreateItem = jdbcTemplate.update(sqlCreateItem);
+        if (testCreateItem == 1) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
     public boolean createBid(Bid bid) {
-        return false;
+        String sqlCreateBid = "INSERT INTO bids (bid_id, bid_date, bid_value, item_id, user_id) " +
+                "VALUES ('" + bid.getBidId() +"', '" + bid.getBidDate() + "', '" + bid.getBidValue() + "', '" +
+                bid.getItemId() + "', '" + bid.getUserId() + "')";
+        int testCreateBid = jdbcTemplate.update(sqlCreateBid);
+        if (testCreateBid == 1) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
