@@ -13,6 +13,7 @@ import com.epam.izh.rd.online.autcion.mappers.UserMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -87,82 +88,29 @@ public class JdbcTemplatePublicAuction implements PublicAuction {
         List<Item> itemList = jdbcTemplate.query(sqlGetItems, new ItemMapper());
 
         for (Item item: itemList) {
-            item.getItemId()
-        }
-
-        /*
-        SELECT items_item_id, bid_increment, buy_it_now, description, start_date, start_price, stop_date, title, user_id, bid_id, bid_date, bid_value, bids_user_id
-        FROM (SELECT items.item_id AS items_item_id, items.bid_increment, items.buy_it_now, items.description, items.start_date, items.start_price, items.stop_date, items.title, items.user_id,
-                bids.bid_id, bids.bid_date, bids.bid_value, bids.user_id AS bids_user_id
-                FROM items
-                INNER JOIN bids
-                ON items.item_id = bids.item_id) AS result
-        WHERE result.items_item_id = '1'
-         */
-
-        
-        /*String sqlMaxBidForEveryItem = "SELECT T1.item_id AS t1itemid, T1.bid_increment, T1.buy_it_now, T1.description, T1.start_date, T1.start_price, T1.stop_date, T1.title, T1.user_id, " +
-                    "T2.bid_id, T2.bid_date, MAX(T2.bid_value), T2.user_id AS bidsuserid " +
-                    "FROM items AS T1 " +
-                    "LEFT JOIN bids AS T2 " +
-                    "ON T1.item_id = T2.item_id " +
-                    "GROUP BY T1.item_id";*/
-        
-        String sqlMaxBidForEveryItem = "SELECT items_bids.item_id, items_bids.bid_increment, items_bids.buy_it_now, items_bids.description, items_bids.start_date, items_bids.start_price, items_bids.stop_date, items_bids.title, items_bids.user_id, " +
-        "items_bids.bid_id, items_bids.bid_date, MAX(items_bids.bid_value), items_bids.bids_user_id " +
-        "FROM (SELECT items.item_id, items.bid_increment, items.buy_it_now, items.description, items.start_date, items.start_price, items.stop_date, items.title, items.user_id, " +
-        "bids.bid_id, bids.bid_date, bids.bid_value, bids.user_id AS bids_user_id " +
-        "FROM items " +
-        "INNER JOIN bids " +
-        "ON items.item_id = bids.item_id) AS items_bids " +
-        "GROUP BY items_bids.item_id";
-
-        List<Map<String, Object>> results = jdbcTemplate.queryForList(sqlMaxBidForEveryItem);
-
-        for (Map<String,Object> map : results) {    
-            
-            String testString = map.get("bid_value").toString();
-
-            if (map.get("bid_value") != null) {                        
-            Item item = new Item();
-            item.setItemId(Long.valueOf(map.get("item_id").toString()));
-            item.setBidIncrement(Double.valueOf(map.get("bid_increment").toString()));
-            item.setBuyItNow(Boolean.valueOf(map.get("buy_it_now").toString()));
-            item.setDescription(map.get("description").toString());
-            item.setStartDate(LocalDate.parse(map.get("start_date").toString()));
-            item.setStartPrice(Double.valueOf(map.get("start_price").toString()));
-            item.setStopDate(LocalDate.parse(map.get("stop_date").toString()));
-            item.setTitle(map.get("title").toString());
-            item.setUserId(Long.valueOf(map.get("user_id").toString()));
-
-            Bid bid = new Bid();
-            bid.setBidId(Long.valueOf(map.get("bid_id").toString()));
-            bid.setBidDate(LocalDate.parse(map.get("bid_date").toString()));
-            bid.setBidValue(Double.valueOf(map.get("bid_value").toString()));
-            bid.setItemId(Long.valueOf(map.get("item_id").toString()));
-            bid.setUserId(Long.valueOf(map.get("bidsuserid").toString()));
-
-            maxBidsForEveryItem.put(item, bid);
-            } else {
+            String sqlMaxBidForEveryItem = "SELECT * " +
+                    "FROM bids " +
+                    "WHERE bid_value = (SELECT MAX(bids.bid_value) " +
+                    "FROM items " +
+                    "INNER JOIN bids " +
+                    "ON items.item_id = bids.item_id " +
+                    "WHERE items.item_id = '" + item.getItemId() + "')";
+            try {
+                Object bidsResult = jdbcTemplate.queryForObject(sqlMaxBidForEveryItem, new BidMapper());
+                maxBidsForEveryItem.put(item, (Bid) bidsResult);
+            } catch (DataAccessException e) {
                 continue;
             }
         }
-
-        //"WHERE item_id =" + "'" + item.getItemId() + "'" + ")";
-
-            //Bid bid = jdbcTemplate.queryForObject(sqlMaxBidForEveryItem, new BidMapper());
-            /*if (bid != null) {
-                maxBidsForEveryItem.put(item, bid);
-            } else {
-                continue;
-            }*/
-        
         return maxBidsForEveryItem;
     }
 
     @Override
     public boolean createUser(User user) {
-        return false;
+        String sqlCreateUser = "INSERT INTO users (user_id, billing_address, full_name, login, password) " +
+                "VALUES (" + user.getUserId() + "," + user.getBillingAddress() + "," + user.getFullName() + "," + user.getLogin() + "," + user.getPassword() + ")";
+        int testCreateUser = jdbcTemplate.update(sqlCreateUser);
+        return true;
     }
 
     @Override
