@@ -1,25 +1,18 @@
 package com.epam.izh.rd.online.autcion.repository;
 
-
 import com.epam.izh.rd.online.autcion.configuration.JdbcTemplateConfiguration;
 import com.epam.izh.rd.online.autcion.entity.Bid;
 import com.epam.izh.rd.online.autcion.entity.Item;
 import com.epam.izh.rd.online.autcion.entity.User;
-import com.epam.izh.rd.online.autcion.mappers.BidMapper;
 import lombok.SneakyThrows;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Import;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.test.context.BootstrapWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -35,15 +28,10 @@ import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 
 @JdbcTest
-//@SpringBootTest
-        //(classes = { JdbcTemplateConfiguration.class })
 @ContextConfiguration(classes = JdbcTemplateConfiguration.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-//@Import(BidMapper.class)
-//@Sql({"src/main/resources/schema.sql", "src/main/resources/data.sql"})
 @Sql({"/schema_test.sql", "/data_test.sql"})
-//@BootstrapWith(JdbcTemplateConfiguration.class)
-//@ComponentScan(basePackages = "com.epam.izh.rd.online.autcion")
+
 class JdbcTemplatePublicAuctionTest {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
@@ -61,7 +49,6 @@ class JdbcTemplatePublicAuctionTest {
     @Autowired
     private PublicAuction publicAuction;
     @Autowired
-    //@Qualifier("jdbcTemplate")
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private RowMapper<Bid> bidRowMapper;

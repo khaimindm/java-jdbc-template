@@ -12,26 +12,14 @@ import com.epam.izh.rd.online.autcion.mappers.ItemMapper;
 import com.epam.izh.rd.online.autcion.mappers.UserMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-
-import java.time.LocalDate;
 import java.util.HashMap;
 
 @Repository
 public class JdbcTemplatePublicAuction implements PublicAuction {
-
-    /*private final JdbcTemplate jdbcTemplate;
-    
-    @Autowired
-    public JdbcTemplatePublicAuction(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }*/
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -76,7 +64,6 @@ public class JdbcTemplatePublicAuction implements PublicAuction {
                 continue;
             }
         }
-
         return avgItemCost;       
     }
 
@@ -148,11 +135,25 @@ public class JdbcTemplatePublicAuction implements PublicAuction {
 
     @Override
     public boolean deleteUserBids(long id) {
-        return false;
+        String sqlDeleteUserBids = "DELETE FROM bids WHERE user_id = " + id;
+        int testDeleteUserBids = jdbcTemplate.update(sqlDeleteUserBids);
+        if (testDeleteUserBids == 1) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
     public boolean doubleItemsStartPrice(long id) {
-        return false;
+        String sqlDoubleItemsStartPrice = "UPDATE items " +
+                "SET start_price = start_price * 2 " +
+                "WHERE user_id = " + id;
+        int testDoubleItemsStartPrice = jdbcTemplate.update(sqlDoubleItemsStartPrice);
+        if (testDoubleItemsStartPrice == 1) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

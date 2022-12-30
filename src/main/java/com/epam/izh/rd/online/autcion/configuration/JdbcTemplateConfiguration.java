@@ -1,19 +1,14 @@
 package com.epam.izh.rd.online.autcion.configuration;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DriverManager;
 
-//@SpringBootApplication
-//@Configuration
 @ComponentScan(basePackages = "com.epam.izh.rd.online.autcion")
 @PropertySource("classpath:application.properties")
 public class JdbcTemplateConfiguration {
@@ -44,9 +39,4 @@ public class JdbcTemplateConfiguration {
         dataSourceBuilder.password(password);
         return dataSourceBuilder.build();
     }
-
-    /*@Bean
-    public JdbcTemplate jdbcTemplate(DataSource dataSource) {
-        return new JdbcTemplate(dataSource);
-    }*/
 }
